@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Analytics Dashboard</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>User Activity Dashboard</h1>
+    <p>User Activity Count: <span id="activityCount">0</span></p>
+    <canvas id="activityChart" width="400" height="200"></canvas>
+    <script>
+        const socket = io();
+
+        document.addEventListener('click', () => {
+            fetch('/track-click', { method: 'POST' });
+        });
+
+        socket.on('update', (data) => {
+            const activityCount = data.userActivityCount || 0;
+            document.getElementById('activityCount').innerText = activityCount;
+        });
+
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'User Activity Count',
+                    data: [],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'minute'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
